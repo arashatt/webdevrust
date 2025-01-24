@@ -60,8 +60,8 @@ the sqlx build query and executes on the connection you have.
 
 ### Migrations manually deleted
 
-what would you do when your migrations are manually deleted?
-the `sqlx migration run` argues that there was a migrated already ran, but it cannot find it anymore.
-your database is corrupt when the migration is lost. so what is the solution?
+What would you do when your migrations are manually deleted?
+the `sqlx migration run` argues that there was a migration already ran, but it cannot find it anymore.
+your database is corrupt when a migration is lost. so what is the solution?
 
-you just need to connect to databae and delete the migration row in `_sqlx_migrations` row.
+you just need to connect to databae and delete the migration row in `_sqlx_migrations` table.
