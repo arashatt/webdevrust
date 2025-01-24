@@ -1,0 +1,32 @@
+// main.rs
+
+#[tokio::main]
+async fn main() {
+    // set up connection pool
+    //
+    let app = Router:new()
+    let manager =
+        deadpool_diesel::postgres::Manager::new(DATABASE_URL, deadpool_diesel::Runtime::Tokio1);
+    let pool = deadpool_diesel::postgres::Pool::builder(manager)
+        .build()
+        .unwrap();
+
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    axum::serve(listener, app()).await.unwrap();
+}
+
+async fn root(State(pool): State<deadpool_diesel::postgres::Pool>) {
+    let results = posts
+        .filter(published.eq(true))
+        .limit(5)
+        .select(Post::as_select())
+        .load(connection)
+        .expect("Error loading posts");
+
+    println!("Displaying {} posts", results.len());
+    for post in results {
+        println!("{}", post.title);
+        println!("-----------\n");
+        println!("{}", post.body);
+    }
+}
