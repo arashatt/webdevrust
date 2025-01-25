@@ -1,4 +1,5 @@
 mod data;
+mod auth;
 
 use axum::{Router, routing::get, response::IntoResponse, extract::State};
 use sqlx::{MySqlPool, mysql::MySqlPoolOptions};
