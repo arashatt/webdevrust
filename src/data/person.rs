@@ -10,11 +10,15 @@ pub struct User{
     pub created_at: DateTime<Local>, // https://docs.rs/sqlx/latest/sqlx/mysql/types/index.html
 }
 
-pub async fn foo(pool:MySqlPool ) -> Vec<User> {
+impl User {
+pub async fn foo(pool : MySqlPool) -> Vec<User>{
 sqlx::query_as::<_, User>("SELECT * FROM user")
   .fetch_all(&pool).await.unwrap()
+    }
 
+pub async fn get_username(username:&str, pool: MySqlPool) -> Result<User,sqlx::Error>{
+    sqlx::query_as::<_,User>("SELECT * FROM user where username=?").bind(username).fetch_one(&pool).await
+    }
 }
 
-struct TimeSpent(u64);
-
+// TODO: use time spent by request. middleware section.
