@@ -5,12 +5,15 @@ use axum::{extract::{Path, State}, response::IntoResponse, routing::get, Router,
 use sqlx::{MySqlPool, mysql::MySqlPoolOptions};
 use dotenvy::dotenv;
 use std::env;
+use log::{debug, error, log_enabled, info, Level};
+use env_logger;
 
 
 #[tokio::main]
 async fn main() -> Result<(), sqlx::Error>{
     dotenv().ok();
-
+    env_logger::init();
+    error!("Error establishing database connection");
     let database_url = env::var("DATABASE_URL").expect("Didn't find mysql url");
     let pool = MySqlPoolOptions::new().connect(&database_url).await?;
     let app = Router::new().route("/", get(root)).route("/get/{username}", get(username)).with_state(pool);
