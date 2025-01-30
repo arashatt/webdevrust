@@ -3,6 +3,7 @@ use argon2::{
     Argon2,
 };
 use std::error::Error;
+
 fn main() {
     let password = b"hunter42"; // Bad password; don't actually use!
     let salt = SaltString::generate(&mut OsRng);

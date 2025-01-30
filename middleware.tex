@@ -1,0 +1,64 @@
+\documentclass[12pt,openany]{scrbook}
+\usepackage{fontspec}
+\usepackage{hyperref} % For clickable links and bookmarks
+\usepackage{geometry} % For setting page margins
+\usepackage{fancyhdr} % For customizing headers and footers
+\usepackage{graphicx} % For including images
+\usepackage{titlesec} % For customizing section titles
+\usepackage{sectsty} % For section styles
+% Set your main font here
+\setmainfont{Palatino}
+
+% Customize page margins
+\geometry{
+  a4paper,
+  left=30mm,
+  right=25mm,
+  top=30mm,
+  bottom=30mm,
+}
+% Customize hyperref settings
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black, % Change link color to black (or any color you prefer)
+  citecolor=black,
+  filecolor=black,
+  urlcolor=black,
+  pdfborder={0 0 0} % Disable the colored border around links
+}
+
+
+% Customize headers and footers
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE]{\leftmark}
+\fancyhead[LO]{\rightmark}
+
+% Customize chapter and section titles
+\chapterfont{\Huge\bfseries}
+\sectionfont{\Large\bfseries}
+
+\title{Your Book Title}
+\author{Author Name}
+\date{}
+
+\begin{document}
+
+% Title page
+\maketitle
+
+% Table of contents
+\tableofcontents
+
+% Add chapters with dummy text
+\chapter{Introduction}
+In this source book we explain different middlewares, and hoepfully the pattern of middlewares in rust.
+\chapter{Chapter Title}
+\section{Section Title}
+
+\chapter{Another Chapter}
+\section{Another Section}
+
+\end{document}
+

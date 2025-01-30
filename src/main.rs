@@ -7,8 +7,8 @@ use axum::{
     handler,
     http::StatusCode,
     response::IntoResponse,
-    routing::get,
-    Router,
+    routing::{get, post},
+    Json, Router,
 };
 use dotenvy::dotenv;
 use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
@@ -25,6 +25,7 @@ async fn main() -> Result<(), sqlx::Error> {
         .route("/", get(root))
         .route("/get/{username}", get(username))
         .route("/test", get(|| async { "test" }))
+        .route("/register", post(register))
         .with_state(pool);
     let listen = tokio::net::TcpListener::bind("127.0.0.1:8000")
         .await
@@ -50,7 +51,7 @@ async fn main() -> Result<(), sqlx::Error> {
 
 use data::person::User;
 async fn root(State(pool): State<MySqlPool>) -> impl IntoResponse {
-    let a = User::foo(pool).await;
+    let a = User::foo(&pool).await;
     format!("{:#?}", a)
 }
 
@@ -58,9 +59,13 @@ async fn username(
     State(pool): State<MySqlPool>,
     Path(user_name): Path<String>,
 ) -> impl IntoResponse {
-    let a = User::get_user_by_username(user_name.as_ref(), pool).await;
+    let a = User::get_user_by_username(user_name.as_ref(), &pool).await;
     match a {
         Ok(record) => (StatusCode::OK, format!("{:#?}", record)),
         Err(e) => (StatusCode::NOT_FOUND, format!("{:#?}", e)),
     }
+}
+use auth::register::register_user;
+async fn register(State(pool): State<MySqlPool>, Json(new_user): Json<User>) -> impl IntoResponse {
+    register_user(new_user, &pool).await
 }
