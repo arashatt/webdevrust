@@ -18,7 +18,16 @@ impl User {
             .unwrap()
     }
 
-    pub async fn get_username(username: &str, pool: MySqlPool) -> Result<User, sqlx::Error> {
+    pub async fn get_user_by_username(
+        username: &str,
+        pool: MySqlPool,
+    ) -> Result<User, sqlx::Error> {
+        sqlx::query_as::<_, User>("SELECT * FROM user where username=?")
+            .bind(username)
+            .fetch_one(&pool)
+            .await
+    }
+    pub async fn get_user_by_email(username: &str, pool: MySqlPool) -> Result<User, sqlx::Error> {
         sqlx::query_as::<_, User>("SELECT * FROM user where username=?")
             .bind(username)
             .fetch_one(&pool)

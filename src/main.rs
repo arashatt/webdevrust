@@ -1,36 +1,66 @@
-mod data;
+#[allow(dead_code)]
 mod auth;
+mod data;
 
-use axum::{extract::{Path, State}, response::IntoResponse, routing::get, Router, http::StatusCode};
-use sqlx::{MySqlPool, mysql::MySqlPoolOptions};
+use axum::{
+    extract::{Path, State},
+    handler,
+    http::StatusCode,
+    response::IntoResponse,
+    routing::get,
+    Router,
+};
 use dotenvy::dotenv;
-use std::env;
-
+use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
+use std::{env, future::IntoFuture, sync::Arc};
+use tokio::sync::oneshot::{self};
 
 #[tokio::main]
-async fn main() -> Result<(), sqlx::Error>{
+async fn main() -> Result<(), sqlx::Error> {
     dotenv().ok();
     tracing_subscriber::fmt::init();
     let database_url = env::var("DATABASE_URL").expect("Didn't find mysql url");
     let pool = MySqlPoolOptions::new().connect(&database_url).await?;
-    let app = Router::new().route("/", get(root)).route("/get/{username}", get(username)).with_state(pool);
-    let listen = tokio::net::TcpListener::bind("127.0.0.1:8000").await.unwrap();
-    axum::serve(listen, app).await.unwrap();
+    let app = Router::new()
+        .route("/", get(root))
+        .route("/get/{username}", get(username))
+        .route("/test", get(|| async { "test" }))
+        .with_state(pool);
+    let listen = tokio::net::TcpListener::bind("127.0.0.1:8000")
+        .await
+        .unwrap();
+    let (tx, rx) = oneshot::channel();
+
+    let server = axum::serve(listen, app).with_graceful_shutdown(async {
+        match rx.await {
+            Ok(message) => println!("{}", message),
+            Err(_) => {}
+        }
+    });
+
+    let handler = tokio::spawn(server.into_future());
+
+    tokio::spawn(async {
+        tokio::signal::ctrl_c().await.unwrap();
+        tx.send("Finished").unwrap();
+    });
+    handler.await.unwrap().unwrap();
     Ok(())
 }
+
 use data::person::User;
-async fn root(State(pool): State<MySqlPool>) -> impl IntoResponse{
+async fn root(State(pool): State<MySqlPool>) -> impl IntoResponse {
     let a = User::foo(pool).await;
     format!("{:#?}", a)
-
 }
 
-async fn username(State(pool):State<MySqlPool>, Path(user_name):Path<String>) -> impl IntoResponse {
-let a = User::get_username(&user_name, pool).await;
+async fn username(
+    State(pool): State<MySqlPool>,
+    Path(user_name): Path<String>,
+) -> impl IntoResponse {
+    let a = User::get_user_by_username(user_name.as_ref(), pool).await;
     match a {
-        Ok(record) =>
-            (StatusCode::OK, format!("{:#?}", record)),
-        Err(_) => (StatusCode::NOT_FOUND, "Not Found!".to_owned())
-        }
-
+        Ok(record) => (StatusCode::OK, format!("{:#?}", record)),
+        Err(e) => (StatusCode::NOT_FOUND, format!("{:#?}", e)),
+    }
 }
