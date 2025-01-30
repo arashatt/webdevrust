@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 argon2 = "0.5.3"
 axum = { version = "0.8.1", features = ["tokio", "ws"] }
+axum-extra = { version = "0.10.0", features = ["cookie"] }
 chrono = { version = "0.4.39", features = ["serde"] }
 dotenvy = "0.15.7"
 env_logger = "0.11.6"
@@ -15,5 +16,6 @@ log = "0.4.25"
 serde = { version = "1.0.217", features = ["derive"] }
 sqlx = { version = "0.8.3", features = ["chrono", "mysql", "runtime-tokio"] }
 tokio = { version = "1.43.0", features = ["full"] }
+tracing-subscriber = "0.3.19"
 uuid = { version = "1.12.1", features = ["serde"] }
 
