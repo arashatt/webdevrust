@@ -11,6 +11,7 @@ use axum::{
     Json, Router,
 };
 use dotenvy::dotenv;
+use serde::{Deserialize, Serialize};
 use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
 use std::{env, future::IntoFuture, sync::Arc};
 use tokio::sync::oneshot::{self};
@@ -26,6 +27,7 @@ async fn main() -> Result<(), sqlx::Error> {
         .route("/get/{username}", get(username))
         .route("/test", get(|| async { "test" }))
         .route("/register", post(register))
+        .route("/login", post(login))
         .with_state(pool);
     let listen = tokio::net::TcpListener::bind("127.0.0.1:8000")
         .await
@@ -67,7 +69,28 @@ async fn username(
 }
 use auth::register::register_user;
 async fn register(State(pool): State<MySqlPool>, Json(new_user): Json<User>) -> impl IntoResponse {
-let response =     register_user(new_user, &pool).await;
+    let response = register_user(new_user, &pool).await;
     dbg!(response);
-response
+    response
+}
+#[derive(Serialize, Deserialize)]
+struct LoginForm {
+    username: String,
+    password: String,
+}
+use auth::register::login_user;
+async fn login(
+    State(pool): State<MySqlPool>,
+    Json(new_user): Json<LoginForm>,
+) -> impl IntoResponse {
+    match login_user(
+        new_user.username.as_str(),
+        &new_user.password.as_str(),
+        &pool,
+    )
+    .await
+    {
+        Ok(_) => (StatusCode::OK, "Correct".to_owned()),
+        Err(err) => (StatusCode::FORBIDDEN, format!("{:#?}", err)),
+    }
 }

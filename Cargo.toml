@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-argon2 = "0.5.3"
+argon2 = { version = "0.5.3", features = ["password-hash"] }
 axum = { version = "0.8.1", features = ["tokio", "ws"] }
 axum-extra = { version = "0.10.0", features = ["cookie"] }
 chrono = { version = "0.4.39", features = ["serde"] }
@@ -15,6 +15,7 @@ jsonwebtoken = "9.3.0"
 log = "0.4.25"
 serde = { version = "1.0.217", features = ["derive"] }
 sqlx = { version = "0.8.3", features = ["chrono", "mysql", "runtime-tokio"] }
+thiserror = "2.0.11"
 tokio = { version = "1.43.0", features = ["full"] }
 tracing-subscriber = "0.3.19"
 uuid = { version = "1.12.1", features = ["serde"] }
