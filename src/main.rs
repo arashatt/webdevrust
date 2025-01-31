@@ -67,5 +67,7 @@ async fn username(
 }
 use auth::register::register_user;
 async fn register(State(pool): State<MySqlPool>, Json(new_user): Json<User>) -> impl IntoResponse {
-    register_user(new_user, &pool).await
+let response =     register_user(new_user, &pool).await;
+    dbg!(response);
+response
 }

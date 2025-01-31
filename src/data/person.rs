@@ -9,7 +9,7 @@ pub struct User {
     pub username: String,
     pub email: String,
     pub password: String,
-    pub created_at: DateTime<Local>, // https://docs.rs/sqlx/latest/sqlx/mysql/types/index.html
+    pub created_at: Option<DateTime<Local>>, // https://docs.rs/sqlx/latest/sqlx/mysql/types/index.html
 }
 impl User {
     pub async fn foo(pool: &MySqlPool) -> Vec<User> {
@@ -28,10 +28,10 @@ impl User {
             .fetch_one(pool)
             .await
     }
-    pub async fn get_user_by_email(email: &str, pool: MySqlPool) -> Result<User, sqlx::Error> {
+    pub async fn get_user_by_email(email: &str, pool: &MySqlPool) -> Result<User, sqlx::Error> {
         sqlx::query_as::<_, User>("SELECT * FROM user where email=?")
             .bind(email)
-            .fetch_one(&pool)
+            .fetch_one(pool)
             .await
     }
 }
