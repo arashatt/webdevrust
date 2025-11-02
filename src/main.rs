@@ -14,12 +14,24 @@ use dotenvy::dotenv;
 use serde::{Deserialize, Serialize};
 use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
 use std::{env, future::IntoFuture, sync::Arc};
+use testcontainers_modules::mysql;
+use testcontainers_modules::testcontainers::runners::AsyncRunner;
 use tokio::sync::oneshot::{self};
-
 #[tokio::main]
 async fn main() -> Result<(), sqlx::Error> {
     dotenv().ok();
     tracing_subscriber::fmt::init();
+    let mysql_instance = mysql::Mysql::default().start().await.unwrap();
+    //    let database_url = format!(
+    //    "mysql://{}:{}/test",
+    //    mysql_instance.get_host().unwrap(),
+    //    mysql_instance.get_host_port_ipv4(3306).unwrap()
+    // );
+    print!(
+        "{}   {}",
+        mysql_instance.get_host().await.unwrap(),
+        mysql_instance.get_host_port_ipv4(3306).await.unwrap()
+    );
     let database_url = env::var("DATABASE_URL").expect("Didn't find mysql url");
     let pool = MySqlPoolOptions::new().connect(&database_url).await?;
     let app = Router::new()
