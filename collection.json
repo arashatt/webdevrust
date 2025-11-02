@@ -1,0 +1,134 @@
+{
+  "info": {
+    "name": "Axum SQLx API",
+    "_postman_id": "12345678-abcd-efgh-ijkl-987654321000",
+    "description": "Collection for testing Axum + SQLx API running on port 8000",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Root",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": [""]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"alice\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"secret123\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/register",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["register"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 201', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "pm.test('Response has id', function () {",
+              "    var json = pm.response.json();",
+              "    pm.expect(json).to.have.property('id');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+  "name": "Create User",
+  "request": {
+    "method": "POST",
+    "header": [
+      {
+        "key": "Content-Type",
+        "value": "application/json"
+      }
+    ],
+    "body": {
+      "mode": "raw",
+      "raw": "{\n  \"username\": \"{{random_username}}\",\n  \"email\": \"{{random_email}}\",\n  \"password\": \"{{random_password}}\"\n}"
+    },
+    "url": {
+      "raw": "http://localhost:8000/register",
+      "protocol": "http",
+      "host": ["localhost"],
+      "port": "8000",
+      "path": ["register"]
+    }
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "// Generate random username, email, password before each request",
+          "const randomSuffix = Math.floor(Math.random() * 100000);",
+          "pm.variables.set('random_username', `user_${randomSuffix}`);",
+          "pm.variables.set('random_email', `user_${randomSuffix}@example.com`);",
+          "pm.variables.set('random_password', Math.random().toString(36).slice(-10));"
+        ],
+        "type": "text/javascript"
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "pm.test('Status code is 201', function () {",
+          "    pm.response.to.have.status(201);",
+          "});",
+          "pm.test('Response includes username', function () {",
+          "    var json = pm.response.json();",
+          "    pm.expect(json.username).to.eql(pm.variables.get('random_username'));",
+          "});"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ]
+}
+
+  ]
+}
+
