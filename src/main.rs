@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #[allow(dead_code)]
 mod auth;
 mod data;
@@ -93,12 +92,3 @@ async fn login(
         Err(err) => (StatusCode::FORBIDDEN, format!("{:#?}", err)),
     }
 }
-=======
-
-#[tokio::main]
-async fn main() {
-    let pool = PgPool::connect()
-}
-
-
->>>>>>> 8fbd5c1 (prunging)
