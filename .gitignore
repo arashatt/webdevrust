@@ -1,6 +1,9 @@
 /target
+<<<<<<< HEAD
 Cargo.lock
 .agenda
 *.png
 .env
 .sqlx
+=======
+>>>>>>> 8fbd5c1 (prunging)
