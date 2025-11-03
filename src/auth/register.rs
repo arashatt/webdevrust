@@ -9,8 +9,8 @@ use sqlx::Error as SqlxError;
 use thiserror::Error;
 
 use axum::http::StatusCode;
-use sqlx::MySqlPool;
-pub async fn register_user(new_user: User, pool: &MySqlPool) -> Result<StatusCode, StatusCode> {
+use sqlx::PgPool;
+pub async fn register_user(new_user: User, pool: &PgPool) -> Result<StatusCode, StatusCode> {
     if (matches!(
         User::get_user_by_username(new_user.username.as_ref(), pool).await,
         Err(sqlx::Error::RowNotFound)
@@ -28,7 +28,7 @@ pub async fn register_user(new_user: User, pool: &MySqlPool) -> Result<StatusCod
             .unwrap()
             .to_string();
         let query = sqlx::query!(
-            "INSERT INTO user (username, password, email) VALUES (?, ?, ?)",
+            r#"INSERT INTO "users" (username, password, email) VALUES ($1, $2, $3)"#,
             new_user.username,
             password_hash,
             new_user.email
@@ -53,7 +53,7 @@ pub enum LoginError {
 pub async fn login_user(
     login_user: &str,
     login_password: &str,
-    pool: &MySqlPool,
+    pool: &PgPool,
 ) -> Result<(), LoginError> {
     let db_user = User::get_user_by_username(login_user, pool).await?;
     let parsed_hash =

@@ -26,17 +26,7 @@ psql -U postgres
 
 Here, `-U postgres` specifies connecting as the `postgres` user.
 
-### Step 4: Create a Database
-
-Once you’re inside the `psql` environment, create a new database using:
-
-```
-CREATE DATABASE mydatabase;
-```
-
-Replace `mydatabase` with your desired database name.
-
-### Step 5: Create a User (Optional)
+### Step 4: Create a User (Optional)
 
 You might want to create a specific user for your database:
 
@@ -45,6 +35,22 @@ CREATE USER myuser WITH ENCRYPTED PASSWORD 'mypassword';
 ```
 
 Replace `myuser` and `mypassword` with your preferred username and password.
+
+
+
+### Step 5: Create a Database
+
+Once you’re inside the `psql` environment, create a new database using:
+
+```
+CREATE DATABASE my_database OWNER new_user;
+```
+note: If you use the command below, you can't create databse schemas when migrating with sqlx migrate run command.
+```
+CREATE DATABASE mydatabase;
+```
+
+Replace `mydatabase` with your desired database name.
 
 ### Step 6: Grant Privileges
 

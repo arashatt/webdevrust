@@ -1,6 +1,6 @@
 use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, MySqlPool};
+use sqlx::{FromRow, PgPool};
 
 #[derive(FromRow, Debug, Serialize, Deserialize)]
 pub struct User {
@@ -12,8 +12,8 @@ pub struct User {
     pub created_at: Option<DateTime<Local>>, // https://docs.rs/sqlx/latest/sqlx/mysql/types/index.html
 }
 impl User {
-    pub async fn foo(pool: &MySqlPool) -> Vec<User> {
-        sqlx::query_as::<_, User>("SELECT * FROM user")
+    pub async fn foo(pool: &PgPool) -> Vec<User> {
+        sqlx::query_as::<_, User>("SELECT * FROM users")
             .fetch_all(pool)
             .await
             .unwrap()
@@ -21,15 +21,15 @@ impl User {
 
     pub async fn get_user_by_username(
         username: &str,
-        pool: &MySqlPool,
+        pool: &PgPool,
     ) -> Result<User, sqlx::Error> {
-        sqlx::query_as::<_, User>("SELECT * FROM user where username=?")
+        sqlx::query_as::<_, User>("SELECT * FROM users where username=$1")
             .bind(username)
             .fetch_one(pool)
             .await
     }
-    pub async fn get_user_by_email(email: &str, pool: &MySqlPool) -> Result<User, sqlx::Error> {
-        sqlx::query_as::<_, User>("SELECT * FROM user where email=?")
+    pub async fn get_user_by_email(email: &str, pool: &PgPool) -> Result<User, sqlx::Error> {
+        sqlx::query_as::<_, User>("SELECT * FROM users where email=$1")
             .bind(email)
             .fetch_one(pool)
             .await

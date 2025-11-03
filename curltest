@@ -1,0 +1,9 @@
+#!/bin/bash
+
+curl -X POST http://localhost:8000/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "alice1",
+    "email": "alic1e@example.com",
+    "password": "secret1231"
+  }'

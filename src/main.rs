@@ -12,14 +12,16 @@ use axum::{
 };
 use dotenvy::dotenv;
 use serde::{Deserialize, Serialize};
-use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
+use sqlx::{postgres::PgPoolOptions, Postgres, PgPool};
 use std::{env, future::IntoFuture, sync::Arc};
 use tokio::sync::oneshot::{self};
 #[tokio::main]
 async fn main() -> Result<(), sqlx::Error> {
     dotenv().ok();
-    let database_url = env::var("DATABASE_URL").expect("Didn't find mysql url");
-    let pool = MySqlPoolOptions::new().connect(&database_url).await?;
+    let database_url = env::var("DATABASE_URL").expect("Didn't find postgres url");
+    let pool = PgPoolOptions::new()
+        .max_connections(10)
+        .connect(&database_url).await?;
     let app = Router::new()
         .route("/", get(root))
         .route("/get/{username}", get(username))
@@ -50,13 +52,13 @@ async fn main() -> Result<(), sqlx::Error> {
 }
 
 use data::person::User;
-async fn root(State(pool): State<MySqlPool>) -> impl IntoResponse {
+async fn root(State(pool): State<PgPool>) -> impl IntoResponse {
     let a = User::foo(&pool).await;
     format!("{:#?}", a)
 }
 
 async fn username(
-    State(pool): State<MySqlPool>,
+    State(pool): State<PgPool>,
     Path(user_name): Path<String>,
 ) -> impl IntoResponse {
     let a = User::get_user_by_username(user_name.as_ref(), &pool).await;
@@ -66,7 +68,7 @@ async fn username(
     }
 }
 use auth::register::register_user;
-async fn register(State(pool): State<MySqlPool>, Json(new_user): Json<User>) -> impl IntoResponse {
+async fn register(State(pool): State<PgPool>, Json(new_user): Json<User>) -> impl IntoResponse {
     let response = register_user(new_user, &pool).await;
     dbg!(response);
     response
@@ -78,7 +80,7 @@ struct LoginForm {
 }
 use auth::register::login_user;
 async fn login(
-    State(pool): State<MySqlPool>,
+    State(pool): State<PgPool>,
     Json(new_user): Json<LoginForm>,
 ) -> impl IntoResponse {
     match login_user(
