@@ -54,13 +54,13 @@ RUN adduser \
     --no-create-home \
     --uid "${UID}" \
     appuser
-USER appuser
 
 # Copy the executable from the "build" stage.
 COPY --from=build /bin/server /bin/
+USER appuser
 
 # Expose the port that the application listens on.
-EXPOSE 8000
+EXPOSE 3000
 
 # What the container should run when it is started.
 CMD ["/bin/server"]
