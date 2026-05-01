@@ -24,7 +24,6 @@ RUN --mount=type=bind,source=src,target=src \
     --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
     --mount=type=cache,target=/app/target/ \
     --mount=type=cache,target=/usr/local/cargo/registry/ \
-    --mount=type=bind,source=migrations,target=migrations \
     <<EOF
 set -e
 cargo build --release || exit 1
