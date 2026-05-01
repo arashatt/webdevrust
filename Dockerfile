@@ -8,7 +8,7 @@
 # Create a stage for building the application.
 
 ARG RUST_VERSION=1.70.0
-ARG APP_NAME=webdevrust
+ARG APP_NAME=axum-auth
 FROM rust:latest AS build
 ARG APP_NAME
 WORKDIR /app
